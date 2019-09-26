@@ -7,3 +7,4 @@ The game ends when a player lines up five marbles in a row horizontally, vertica
 Ties are possible when board rotations produce winning conditions for both players.
 
 This version of Pentago includes an AI as your opponent so it is strictly a single player game.
+This project is hosted at https://www.pentago.xyz.
