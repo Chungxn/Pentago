@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=0.5">
+        <title>Pentago</title>
+        <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+        <style>
+        html {
+            background-image: linear-gradient(180deg, gray, black, black);
+            background-size: 100% 275%;
+            height: 100vh;
+        }
+        html body {
+            max-width: 50vw;
+        }
+        html body, #centerContainer, #contentContainer, .bars, #gameBoard table, #arrows-blocks, .arrows {
+            margin: auto;
+        }
+
+        .bars { 
+            list-style-type: none;
+            padding: 25px;
+            border-bottom: 1px solid;
+            text-align: center;
+            
+        }
+        #topBar li {
+            display: inline;
+            color: white;
+            padding: 10px;
+        }
+
+        #topBar li:hover {
+            background-color: lightslategrey;
+            cursor: pointer;
+        }
+
+        #AIMsg {
+            display: block;
+            background-color: transparent;
+            border-radius: 6px;
+            color: white;
+            resize: none;
+            margin-top: 50px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .arrows {
+            position: relative;
+            cursor: pointer;
+            visibility: hidden;
+        }
+
+        .arrows:hover {
+            -webkit-filter: grayscale(100%);
+            filter: grayscale(100%);
+        }
+
+        #gameBoard, #topBar, #controls, #instrContainer, #aiContainer {
+            width: 475px;
+        }
+        #gameBoard td, canvas {
+            padding: 3px;
+            border-radius: 10px;
+
+        }
+        #gameBoard canvas {
+            background-color: #e0ff68;
+            border-width: 1px;
+            border-style: solid;
+            border-color: gray;
+        }
+
+        #controls {
+            margin: 50px;
+        }
+        
+        button {
+            background-color: transparent;
+            color: white;
+            border-radius: 6px;
+            font-size: 18px;
+            padding: 5px;
+            margin-right: 5px;
+        }
+
+        button:hover {
+            background-color: lightslategrey;
+        }
+        
+        #instrContainer, #aiContainer {
+            line-height: 1.3;
+            letter-spacing: 1px;
+        }
+
+        .unselectable {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -khtml-user-select: none;
+            -webkit-touch-callout: none;
+        }
+        
+        @media all and (min-width: 300px) and (max-width: 800px) {
+            #instrContainer, #aiContainer {
+                font-size: xx-small;
+            }
+        }
+
+    </style>
+    </head>
+    
+    
+    <body>
+        <div id="topBar">
+            <ul class="bars">
+                <li id="instrLink">How to play</li>
+                <li id="aiLink">AI Details</li>
+                <li id="playLink">Play Pentago!</li>
+            </ul>
+        </div>
+
+        <div id="contentContainer">
+            <div id="gameBoard">
+                    <div id="arrows-blocks">
+
+                        <img class="arrows unselectable" id="3r" src="img/arrow3R.png" alt="Block Three Clockwise" style="top: 330px; left: 30px"> 
+                        <img class="arrows unselectable" id="3l" src="img/arrow3L.png" alt="Block Three Counter-Clockwise" style="top: 380px; left: 30px"> 
+                        <img class="arrows unselectable" id="4r" src="img/arrow4R.png" alt="Block Four Clockwise" style="top: 380px; left: 250px"> 
+                        <img class="arrows unselectable" id="4l" src="img/arrow4L.png" alt="Block Four Counter-Clockwise" style="top: 330px; left: 245px;"> 
+    
+                        <img class="arrows unselectable" id="1l" src="img/arrow1L.png" alt="Block One Counter-Clockwise" style="top: 60px; right: 175px"> 
+                        <img class="arrows unselectable" id="1r" src="img/arrow1R.png" alt="Block One Clockwise" style="top: 20px; right: 175px"> 
+                        <img class="arrows unselectable" id="2l" src="img/arrow2L.png" alt="Block Two Counter-Clockwise" style="top: 20px; left: 45px"> 
+                        <img class="arrows unselectable" id="2r" src="img/arrow2R.png" alt="Block Two Clockwise" style="top: 60px; left: 40px">
+                        
+                        <table>
+                            <tr>
+                                <td><canvas id="blockOne" width="150" height="150"></canvas></td>
+                                <td><canvas id="blockTwo" width="150" height="150"></canvas></td>
+                            </tr>
+                            <tr>
+                                <td><canvas id="blockThree" width="150" height="150"></canvas></td>
+                                <td><canvas id="blockFour" width="150" height="150"></canvas></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <textarea id="AIMsg" class="unselectable" rows="9" cols="45" readonly="readonly"></textarea>
+            </div>
+
+            <div id="instrContainer" style="display: none; color: white;">
+                <h2>How to play Pentago</h2>
+                <p>
+                    Pentago is a two player strategy game invented by Tomas Flodén. <br>
+                    The game board consists of four separate 3x3 boards. <br>
+                    Each board can be rotated 90 degrees in either direction. <br>
+                    A turn consist of a player placing a marble anywhere within the four boards
+                    then choosing a board to rotate 90 degrees. <br>
+                    There are no limitations in choosing which board to rotate. <br>
+                    The game ends when either player lines up five marbles in a row, either vertically, horizontally, or diagonally. <br>
+                    Ties are possible when both players have lined up five marbles within the same move. <br>
+                    
+                    Good luck and have fun!
+                </p>
+            </div>
+
+            <div id="aiContainer" style="display: none; color: white">
+                <h2>AI</h2>
+                <p>
+                    The AI opponent uses an alpha-beta pruning search algorithm for moves in succession to the opening move. <br>
+                    Its opening move is just a random legal move. <br>
+                    Upon a new game, the AI's search algorithm reaches its worst case scenario where all moves are possible. <br>
+                    The algorithm searches all possible game states, where each game state consists of a marble placed <br>
+                    at a block, a position within the block, a block to rotate, and a direction to rotate that block. <br>
+                    With each game state, the AI will then consider its neighboring states, or next possible move, to determine if the outcome of these states are benficial to the AI. <br>
+                    Therefore, the AI searches heavily in early game states due to the number of move lookahead. <br>
+                    The AI will only lookahead two moves from the current game board to determine its best set of moves. <br>
+                    The algorithm's performance increases as the game progress due to the decreasing number of possible states. <br>
+                </p>
+            </div>
+
+            <div id="controls">
+                    <button id="newGame" class="unselectable" type="button">New Game?</button>
+                    <button id="newGameConfirm" class="unselectable" type="button" style="visibility: hidden">Yes</button>
+                    <button id="newGameCancel" class="unselectable" type="button" style="visibility: hidden">No</button>
+            </div>
+        </div>
+        <script src="pentago.js"></script>
+    </body>
+
+</html>
